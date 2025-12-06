@@ -24,7 +24,7 @@ export default function Home() {
 			/>
 			<div className="h-screen inset-0 pointer-events-none fixed flex items-center justify-center text-center px-3 mix-blend-exclusion text-white">
 				<h1 className="font-serif text-4xl md:text-7xl tracking-tight">
-					<span className="italic">Gardo;</span> Photo Galley
+					<span className="italic">Gardo; </span> Photo Gallery
 				</h1>
 			</div>
 
