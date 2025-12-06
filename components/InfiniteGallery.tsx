@@ -218,9 +218,11 @@ function GalleryScene({
 		maxBlur: 3.0,
 	},
 }: Omit<InfiniteGalleryProps, 'className' | 'style'>) {
+	const { gl } = useThree();
 	const [scrollVelocity, setScrollVelocity] = useState(0);
 	const [autoPlay, setAutoPlay] = useState(true);
 	const lastInteraction = useRef(Date.now());
+	const touchStartY = useRef<number | null>(null);
 
 	// Normalize images to objects
 	const normalizedImages = useMemo(
@@ -319,18 +321,52 @@ function GalleryScene({
 		[speed]
 	);
 
+	// Handle touch input
+	const handleTouchStart = useCallback((e: TouchEvent) => {
+		touchStartY.current = e.touches[0].clientY;
+		setAutoPlay(false);
+		lastInteraction.current = Date.now();
+	}, []);
+
+	const handleTouchMove = useCallback(
+		(e: TouchEvent) => {
+			if (e.cancelable) e.preventDefault();
+			if (touchStartY.current !== null) {
+				const currentY = e.touches[0].clientY;
+				const deltaY = touchStartY.current - currentY;
+
+				setScrollVelocity((prev) => prev + deltaY * 0.05 * speed);
+				touchStartY.current = currentY;
+				setAutoPlay(false);
+				lastInteraction.current = Date.now();
+			}
+		},
+		[speed]
+	);
+
+	const handleTouchEnd = useCallback(() => {
+		touchStartY.current = null;
+		lastInteraction.current = Date.now();
+	}, []);
+
 	useEffect(() => {
-		const canvas = document.querySelector('canvas');
+		const canvas = gl.domElement;
 		if (canvas) {
 			canvas.addEventListener('wheel', handleWheel, { passive: false });
+			canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+			canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+			canvas.addEventListener('touchend', handleTouchEnd);
 			document.addEventListener('keydown', handleKeyDown);
 
 			return () => {
 				canvas.removeEventListener('wheel', handleWheel);
+				canvas.removeEventListener('touchstart', handleTouchStart);
+				canvas.removeEventListener('touchmove', handleTouchMove);
+				canvas.removeEventListener('touchend', handleTouchEnd);
 				document.removeEventListener('keydown', handleKeyDown);
 			};
 		}
-	}, [handleWheel, handleKeyDown]);
+	}, [gl.domElement, handleWheel, handleKeyDown, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
 	// Auto-play logic
 	useEffect(() => {
