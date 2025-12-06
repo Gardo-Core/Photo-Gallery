@@ -16,7 +16,7 @@ export default function Home() {
 		<main className="min-h-screen ">
 			<InfiniteGallery
 				images={sampleImages}
-				speed={1.2}
+				speed={1.5}
 				zSpacing={3}
 				visibleCount={12}
 				falloff={{ near: 0.8, far: 14 }}
@@ -24,7 +24,7 @@ export default function Home() {
 			/>
 			<div className="h-screen inset-0 pointer-events-none fixed flex items-center justify-center text-center px-3 mix-blend-exclusion text-white">
 				<h1 className="font-serif text-4xl md:text-7xl tracking-tight">
-					<span className="italic">I create;</span> therefore I am
+					<span className="italic">Gardo;</span> Photo Galley
 				</h1>
 			</div>
 
